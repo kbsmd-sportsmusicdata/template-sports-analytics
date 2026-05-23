@@ -2,6 +2,7 @@ import json
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,7 +21,14 @@ def copy_repo_to_tmp():
     shutil.copytree(
         REPO_ROOT,
         target,
-        ignore=shutil.ignore_patterns("__pycache__", ".DS_Store", "*.pyc"),
+        ignore=shutil.ignore_patterns(
+            "__pycache__",
+            ".DS_Store",
+            "*.pyc",
+            ".git",
+            ".venv",
+            "vendor",
+        ),
     )
     return tmpdir, target
 
@@ -69,7 +77,7 @@ class TemplateRepoTests(unittest.TestCase):
         ]:
             (repo_copy / rel_path).unlink(missing_ok=True)
 
-        result = run(["python3", "scripts/init_project.py"], cwd=repo_copy)
+        result = run([sys.executable, "scripts/init_project.py"], cwd=repo_copy)
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertIn("README.md", result.stdout)
         self.assertTrue((repo_copy / "README.md").exists())
@@ -79,7 +87,7 @@ class TemplateRepoTests(unittest.TestCase):
         tmpdir, repo_copy = copy_repo_to_tmp()
         self.addCleanup(tmpdir.cleanup)
 
-        result = run(["python3", "scripts/validate_data.py"], cwd=repo_copy)
+        result = run([sys.executable, "scripts/validate_data.py"], cwd=repo_copy)
         self.assertEqual(result.returncode, 0, msg=result.stderr)
 
         summary_path = repo_copy / "reports" / "validation_summary.json"
@@ -94,16 +102,17 @@ class TemplateRepoTests(unittest.TestCase):
         tmpdir, repo_copy = copy_repo_to_tmp()
         self.addCleanup(tmpdir.cleanup)
 
-        init_result = run(["python3", "scripts/init_project.py"], cwd=repo_copy)
+        init_result = run([sys.executable, "scripts/init_project.py"], cwd=repo_copy)
         self.assertEqual(init_result.returncode, 0, msg=init_result.stderr)
 
-        result = run(["python3", "scripts/publish_check.py"], cwd=repo_copy)
+        result = run([sys.executable, "scripts/publish_check.py"], cwd=repo_copy)
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertIn("PASS", result.stdout)
 
-    def test_notebook_asset_references_exist(self):
+    def test_notebook_asset_references_exist_if_present(self):
         notebook = (REPO_ROOT / "notebooks" / "index.html").read_text(encoding="utf-8", errors="ignore")
-        self.assertIn("This is a placeholder HTML notebook.", notebook)
+        self.assertTrue(notebook.strip())
+        self.assertRegex(notebook.lower(), r"<html|<!doctype html")
         asset_refs = sorted(set(re.findall(r"assets/[^'\" )]+", notebook)))
         missing = [asset for asset in asset_refs if not (REPO_ROOT / asset).exists()]
         self.assertEqual([], missing)

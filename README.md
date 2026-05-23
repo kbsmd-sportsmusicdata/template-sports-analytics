@@ -4,6 +4,20 @@
 
 One-paragraph project description.
 
+## How To Use This Template
+
+1. Copy this template into a new repo for your project.
+2. Update `project_config.yml` with your project metadata and links.
+3. Replace `notebooks/index.html` with your final HTML notebook or dashboard export.
+4. Optionally add small datasets to `data/processed/` and list them under `data.expected_files`.
+5. Run the setup and checks:
+
+```bash
+python scripts/init_project.py
+python scripts/validate_data.py
+python scripts/publish_check.py
+```
+
 ## Live Project
 
 - HTML Notebook: 
