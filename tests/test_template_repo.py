@@ -1,4 +1,5 @@
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -99,6 +100,14 @@ class TemplateRepoTests(unittest.TestCase):
         result = run(["python3", "scripts/publish_check.py"], cwd=repo_copy)
         self.assertEqual(result.returncode, 0, msg=result.stderr)
         self.assertIn("PASS", result.stdout)
+
+    def test_notebook_asset_references_exist(self):
+        notebook = (REPO_ROOT / "notebooks" / "index.html").read_text(encoding="utf-8", errors="ignore")
+        self.assertIn("WNBA Expansion, Arena Control, and the Premium-Seat Advantage", notebook)
+        asset_refs = sorted(set(re.findall(r"assets/[^'\" )]+", notebook)))
+        self.assertGreater(len(asset_refs), 0)
+        missing = [asset for asset in asset_refs if not (REPO_ROOT / asset).exists()]
+        self.assertEqual([], missing)
 
 
 if __name__ == "__main__":

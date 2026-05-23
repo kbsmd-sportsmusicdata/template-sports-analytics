@@ -1,29 +1,1758 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sports Analytics Project</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      max-width: 900px;
-      margin: 48px auto;
-      padding: 0 24px;
-      line-height: 1.6;
-    }
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 16px;
-      padding: 24px;
-      background: #fafafa;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Sports Analytics Project</h1>
-    <p>This is a placeholder HTML notebook. Replace this file with the final project notebook or dashboard.</p>
-  </div>
-</body>
-</html>
+
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>WNBA Expansion Notebook</title>
+      <style>
+        :root {
+          --bg: #f4efe7;
+          --paper: #ffffff;
+          --ink: #17212b;
+          --muted: #5e6a78;
+          --border: #d7d0c7;
+          --accent: #a36b2b;
+          --independent: #1f7a73;
+          --nba: #2d4bd4;
+          --hybrid: #a06b2b;
+          --future: #7d5bbf;
+          --shadow: 0 18px 42px rgba(22, 31, 42, 0.07);
+        }
+        html {
+          scroll-behavior: smooth;
+        }
+        body {
+          margin: 0;
+          background:
+            radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 32%),
+            linear-gradient(180deg, #f6f1e8 0%, #efe8dc 100%);
+          color: var(--ink);
+          font-family: Georgia, "Times New Roman", serif;
+          line-height: 1.6;
+        }
+        .shell {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 20px 18px 60px;
+        }
+        .toc {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          padding: 12px 14px;
+          margin: 0 0 18px;
+          background: rgba(244,239,231,.88);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(215,208,199,.82);
+          border-radius: 16px;
+          box-shadow: 0 8px 20px rgba(23,33,43,.05);
+        }
+        .toc a {
+          color: var(--ink);
+          text-decoration: none;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: .02em;
+          padding: 8px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(23,33,43,.08);
+          background: rgba(255,255,255,.72);
+        }
+        .hero {
+          background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,252,248,.96));
+          border: 1px solid rgba(215,208,199,.8);
+          border-radius: 24px;
+          padding: 28px;
+          box-shadow: var(--shadow);
+          margin-bottom: 28px;
+        }
+        .hero-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.5fr) minmax(320px, .95fr);
+          gap: 22px;
+          align-items: start;
+        }
+        .eyebrow {
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          text-transform: uppercase;
+          letter-spacing: .18em;
+          font-size: 11px;
+          color: var(--accent);
+          margin-bottom: 10px;
+          font-weight: 800;
+        }
+        h1 {
+          font-size: clamp(2.15rem, 4.1vw, 4.25rem);
+          line-height: .98;
+          margin: 0 0 14px;
+          max-width: 11ch;
+        }
+        .lede {
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 17px;
+          line-height: 1.7;
+          color: #2e3947;
+          max-width: 70ch;
+          margin: 0 0 16px;
+        }
+        .hero-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 8px;
+        }
+        .pill-link {
+          text-decoration: none;
+          color: var(--ink);
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 13px;
+          font-weight: 700;
+          background: rgba(255,255,255,.88);
+          border: 1px solid rgba(23,33,43,.1);
+          padding: 9px 12px;
+          border-radius: 999px;
+        }
+        .hero-panel {
+          background: linear-gradient(180deg, rgba(35,45,59,.98), rgba(24,33,44,.98));
+          color: white;
+          border-radius: 22px;
+          padding: 20px;
+          box-shadow: 0 18px 42px rgba(20,26,35,.18);
+        }
+        .panel-title {
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          text-transform: uppercase;
+          letter-spacing: .14em;
+          font-size: 10px;
+          color: rgba(255,255,255,.72);
+          margin-bottom: 14px;
+          font-weight: 800;
+        }
+        .stat-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .stat {
+          background: rgba(255,255,255,.07);
+          border: 1px solid rgba(255,255,255,.1);
+          border-radius: 14px;
+          padding: 12px 12px 13px;
+        }
+        .stat span {
+          display: block;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 11px;
+          color: rgba(255,255,255,.72);
+          margin-bottom: 5px;
+          line-height: 1.2;
+        }
+        .stat strong {
+          font-size: 26px;
+          line-height: 1.05;
+          font-weight: 700;
+        }
+        .note-box, .callout {
+          margin-top: 16px;
+          padding: 14px 15px;
+          background: rgba(255,255,255,.08);
+          border: 1px solid rgba(255,255,255,.11);
+          border-radius: 16px;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 14px;
+          line-height: 1.55;
+        }
+        .callout {
+          background: rgba(255,255,255,.86);
+          color: #2f3845;
+          border-color: rgba(215,208,199,.85);
+          box-shadow: 0 12px 24px rgba(23,33,43,.05);
+        }
+        .callout.warning {
+          border-left: 4px solid #c58b2b;
+        }
+        .section {
+          margin: 34px 0 26px;
+          padding: 24px 0 0;
+          border-top: 1px solid rgba(23,33,43,.12);
+        }
+        .section-head {
+          display: grid;
+          gap: 10px;
+          margin-bottom: 20px;
+          max-width: 78ch;
+        }
+        .section-kicker {
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          text-transform: uppercase;
+          letter-spacing: .18em;
+          font-size: 11px;
+          color: var(--accent);
+          font-weight: 800;
+        }
+        .section-head h2 {
+          font-size: clamp(1.55rem, 3vw, 2.55rem);
+          line-height: 1.06;
+          margin: 0;
+        }
+        .section-head p {
+          margin: 0;
+          color: #394552;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 16px;
+        }
+        .summary-row {
+          display: grid;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 12px;
+          margin: 8px 0 20px;
+        }
+        .summary-card {
+          background: rgba(255,255,255,.9);
+          border: 1px solid rgba(215,208,199,.85);
+          border-radius: 16px;
+          padding: 13px 14px;
+          box-shadow: 0 10px 20px rgba(23,33,43,.04);
+        }
+        .summary-card.independent {
+          border-top: 4px solid var(--independent);
+        }
+        .summary-card.nba {
+          border-top: 4px solid var(--nba);
+        }
+        .summary-card.accent {
+          border-top: 4px solid var(--accent);
+        }
+        .summary-card.warn {
+          border-top: 4px solid #c0443a;
+        }
+        .summary-label {
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          text-transform: uppercase;
+          letter-spacing: .12em;
+          font-size: 10px;
+          color: #69727d;
+          margin-bottom: 8px;
+          min-height: 26px;
+        }
+        .summary-value {
+          font-size: 26px;
+          font-weight: 700;
+          line-height: 1.05;
+        }
+        .figure-card {
+          margin: 18px 0 20px;
+          padding: 18px;
+          background: rgba(255,255,255,.9);
+          border: 1px solid rgba(215,208,199,.85);
+          border-radius: 22px;
+          box-shadow: var(--shadow);
+        }
+        .figure-head {
+          display: grid;
+          gap: 4px;
+          margin-bottom: 14px;
+        }
+        .figure-head h3 {
+          margin: 0;
+          font-size: 1.35rem;
+          line-height: 1.14;
+        }
+        .figure-head p {
+          margin: 0;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          color: #41505f;
+          font-size: 14px;
+        }
+        .figure-card img {
+          width: 100%;
+          display: block;
+        }
+        .figure-card figcaption {
+          margin-top: 10px;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          color: #6a7380;
+          font-size: 12px;
+        }
+        .figure-note {
+          margin-top: 10px;
+          color: #3a4554;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 13px;
+        }
+        .table-section {
+          margin-top: 10px;
+          padding: 18px;
+          background: rgba(255,255,255,.9);
+          border: 1px solid rgba(215,208,199,.85);
+          border-radius: 22px;
+          box-shadow: var(--shadow);
+        }
+        .section-subhead {
+          font-size: 1.15rem;
+          font-weight: 700;
+          margin-bottom: 4px;
+        }
+        .table-intro {
+          margin: 0 0 14px;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          color: #41505f;
+          font-size: 14px;
+        }
+        .table-toolbar {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+        .button-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .filter-btn {
+          border: 1px solid rgba(23,33,43,.12);
+          background: white;
+          border-radius: 999px;
+          padding: 8px 12px;
+          font: 700 12px/1.1 "Helvetica Neue", Arial, sans-serif;
+          color: #374454;
+          cursor: pointer;
+        }
+        .filter-btn.active {
+          background: var(--ink);
+          color: white;
+          border-color: var(--ink);
+        }
+        .search-box {
+          min-width: min(390px, 100%);
+          border: 1px solid rgba(23,33,43,.12);
+          border-radius: 999px;
+          padding: 10px 13px;
+          font: 14px "Helvetica Neue", Arial, sans-serif;
+          color: var(--ink);
+          background: white;
+        }
+        .table-scroll {
+          overflow: auto;
+          border-radius: 18px;
+          border: 1px solid rgba(23,33,43,.08);
+          max-height: 560px;
+          background: white;
+        }
+        .claim-table-scroll {
+          max-height: 680px;
+        }
+        .data-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 13px;
+        }
+        .data-table thead th {
+          position: sticky;
+          top: 0;
+          background: #fbfaf7;
+          z-index: 1;
+          text-align: left;
+          padding: 12px 10px;
+          border-bottom: 1px solid rgba(23,33,43,.09);
+          color: #334150;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: .12em;
+        }
+        .data-table tbody td {
+          padding: 11px 10px;
+          border-bottom: 1px solid rgba(23,33,43,.06);
+          vertical-align: top;
+        }
+        .data-table tbody tr:nth-child(even) {
+          background: #fcfbf8;
+        }
+        .data-table tbody tr:hover {
+          background: #f4f7fb;
+        }
+        .num {
+          text-align: right;
+          white-space: nowrap;
+          font-variant-numeric: tabular-nums;
+        }
+        .muted {
+          color: #6c7581;
+        }
+        .rank {
+          color: #76818e;
+          font-weight: 700;
+          text-align: right;
+          width: 40px;
+        }
+        .util-wrap {
+          display: grid;
+          gap: 5px;
+          min-width: 130px;
+        }
+        .util-bar {
+          position: relative;
+          height: 10px;
+          border-radius: 999px;
+          background: #e9e3d8;
+          overflow: hidden;
+        }
+        .bar-fill {
+          display: block;
+          height: 100%;
+          border-radius: 999px;
+          background: linear-gradient(90deg, var(--independent), var(--nba));
+        }
+        .pill {
+          display: inline-block;
+          border-radius: 999px;
+          padding: 4px 9px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: .03em;
+          white-space: nowrap;
+        }
+        .owner-nba-affiliated {
+          color: #2037a8;
+          background: rgba(45,75,212,.1);
+        }
+        .owner-independent {
+          color: #155d59;
+          background: rgba(31,119,115,.1);
+        }
+        .owner-hybrid {
+          color: #8d5b10;
+          background: rgba(160,107,43,.12);
+        }
+        .owner-future {
+          color: #5f45aa;
+          background: rgba(125,91,191,.13);
+        }
+        .claim-ownership {
+          background: rgba(45,75,212,.1);
+          color: #2037a8;
+        }
+        .claim-venue {
+          background: rgba(31,119,115,.1);
+          color: #155d59;
+        }
+        .claim-premium {
+          background: rgba(160,107,43,.12);
+          color: #8d5b10;
+        }
+        .claim-financial {
+          background: rgba(192,68,58,.12);
+          color: #9d2d27;
+        }
+        .claim-history, .claim-expansion, .claim-strategy, .claim-culture, .claim-staffing {
+          background: rgba(107,114,128,.12);
+          color: #47525f;
+        }
+        .check-metro {
+          background: rgba(31,119,115,.12);
+          color: #155d59;
+        }
+        .check-revenue {
+          background: rgba(160,107,43,.12);
+          color: #8d5b10;
+        }
+        .check-income {
+          background: rgba(192,68,58,.12);
+          color: #9d2d27;
+        }
+        .method-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 12px;
+        }
+        .method-box {
+          background: rgba(255,255,255,.88);
+          border: 1px solid rgba(215,208,199,.85);
+          border-radius: 18px;
+          padding: 16px;
+          box-shadow: 0 10px 20px rgba(23,33,43,.04);
+        }
+        .method-box strong {
+          display: block;
+          margin-bottom: 8px;
+          font-size: 1.02rem;
+        }
+        .method-box p {
+          margin: 0;
+          color: #41505f;
+          font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+        code {
+          font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+          font-size: .93em;
+          background: rgba(23,33,43,.05);
+          padding: 0 .24em;
+          border-radius: 4px;
+        }
+        @media (max-width: 980px) {
+          .hero-grid, .method-grid {
+            grid-template-columns: 1fr;
+          }
+          .summary-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (max-width: 720px) {
+          .shell {
+            padding: 12px 10px 44px;
+          }
+          .summary-row {
+            grid-template-columns: 1fr;
+          }
+          .stat-grid {
+            grid-template-columns: 1fr;
+          }
+          h1 {
+            max-width: none;
+          }
+          .search-box {
+            min-width: 100%;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="shell" id="top">
+        
+    <nav class="toc">
+      <a href="#top">Overview</a>
+      <a href="#ownership">Ownership</a>
+      <a href="#market">Market</a>
+      <a href="#venues">Venues</a>
+      <a href="#premium">Premium seats</a>
+      <a href="#demand">Demand spikes</a>
+      <a href="#appendix">Appendix</a>
+    </nav>
+    
+        
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">WNBA Expansion Research Notebook</div>
+          <h1>WNBA Expansion, Arena Control, and the Premium-Seat Advantage</h1>
+          <p class="lede">
+            A notebook-style exploration of how ownership structure, arena capacity, premium seats, and game-level demand
+            shape the league’s current expansion logic. The article’s thesis is simple: the WNBA’s strongest monetization
+            path comes from NBA-linked infrastructure, but the data also shows how independent franchises can still win when
+            they control premium inventory and upsized venues.
+          </p>
+          <div class="hero-actions">
+            <a href="#ownership" class="pill-link">Ownership</a>
+            <a href="#venues" class="pill-link">Venues</a>
+            <a href="#premium" class="pill-link">Premium seats</a>
+            <a href="#demand" class="pill-link">Demand spikes</a>
+            <a href="#appendix" class="pill-link">Evidence appendix</a>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <div class="panel-title">Key readouts</div>
+          <div class="stat-grid">
+            <div class="stat"><span>Games</span><strong>526</strong></div>
+            <div class="stat"><span>Teams</span><strong>13</strong></div>
+            <div class="stat"><span>Arenas</span><strong>23</strong></div>
+            <div class="stat"><span>Sellouts</span><strong>98</strong></div>
+            <div class="stat"><span>Record games</span><strong>39</strong></div>
+            <div class="stat"><span>NBA-affiliated avg attendance</span><strong>12,139</strong></div>
+            <div class="stat"><span>Independent avg attendance</span><strong>8,610</strong></div>
+            <div class="stat"><span>Premium appendix claims</span><strong>47</strong></div>
+          </div>
+          <div class="note-box">
+            <strong>Read this as a venue economics brief.</strong>
+            The article is not mainly about wins and losses. It is about who owns the building, who controls the premium seats,
+            and how much operating leverage that creates.
+          </div>
+        </aside>
+      </div>
+    </header>
+    
+        <div class="summary-row">
+    <div class="summary-card independent">
+      <div class="summary-label">Independent avg attendance</div>
+      <div class="summary-value">8,610</div>
+    </div>
+    
+    <div class="summary-card nba">
+      <div class="summary-label">NBA-affiliated avg attendance</div>
+      <div class="summary-value">12,139</div>
+    </div>
+    
+    <div class="summary-card accent">
+      <div class="summary-label">Sellouts</div>
+      <div class="summary-value">98</div>
+    </div>
+    
+    <div class="summary-card warn">
+      <div class="summary-label">Record games</div>
+      <div class="summary-value">39</div>
+    </div>
+    
+    <div class="summary-card ">
+      <div class="summary-label">Teams</div>
+      <div class="summary-value">13</div>
+    </div>
+    
+    <div class="summary-card ">
+      <div class="summary-label">Arenas</div>
+      <div class="summary-value">23</div>
+    </div>
+    </div>
+        <section class="section">
+          <div class="section-head">
+            <div class="section-kicker">Executive takeaways</div>
+            <h2>The notebook reads like a venue-economics memo, not just an attendance report.</h2>
+            <p>
+              NBA-affiliated teams average 12,542 attendance, compared with 8,610 for independent teams.
+              The strongest teams combine ownership support, premium inventory, and the ability to shift marquee games into bigger buildings.
+            </p>
+          </div>
+          <div class="callout">
+            <strong>Most important pattern:</strong> the article is not claiming that independents cannot succeed. It is saying the best independent examples win by building an NBA-like premium stack, especially Seattle and Las Vegas.
+          </div>
+        </section>
+        
+    <section class="section" id="ownership">
+      <div class="section-head">
+        <div class="section-kicker">01 Ownership landscape</div>
+        <h2>The league’s structure is drifting back toward NBA-linked ownership, but the independent teams still matter.</h2>
+        <p>
+          The article’s premise is visible in the ownership map: the biggest expansion decisions tilt toward NBA owners,
+          while the independent holdouts rely more heavily on venue control and premium inventory. Seattle is the clearest
+          example of an independent that can still monetize like a larger-market club.
+        </p>
+      </div>
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Ownership eras across the league</h3>
+        <p>A compact timeline shows how the WNBA’s current teams evolved from founding NBA-linked clubs toward a more mixed ownership model, then back toward NBA-affiliated expansion.</p>
+      </div>
+      <img src="assets/ownership_timeline.svg" alt="Ownership eras across the league">
+      <figcaption>Source: Ownership_Map.csv, dim_ownership_history.csv, and article-derived historical eras.</figcaption>
+      
+    </figure>
+    
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Attendance is higher for NBA-affiliated teams</h3>
+        <p>Box plot plus jittered points show the separation between the two ownership buckets in the game-level attendance file.</p>
+      </div>
+      <img src="assets/attendance_boxplot.svg" alt="Attendance is higher for NBA-affiliated teams">
+      <figcaption>Source: fact_games.csv. Ownership classification comes from dim_teams.csv and Ownership_Map.csv.</figcaption>
+      
+    </figure>
+    
+    </section>
+    
+        
+    <section class="section" id="market">
+      <div class="section-head">
+        <div class="section-kicker">02 Market size and per-capita demand</div>
+        <h2>Metro size sharpens the attendance story, but only if the market bridge is clean.</h2>
+        <p>
+          The metro population file adds a market lens to the attendance table. It lets us compare teams on a per-capita basis,
+          see how market size lines up with venue utilization, and keep the unmatched current markets visible instead of hiding them.
+        </p>
+      </div>
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Attendance per million residents</h3>
+        <p>Ranked bars show which active teams draw the most attendance relative to their metro size.</p>
+      </div>
+      <img src="assets/attendance_per_capita.svg" alt="Attendance per million residents">
+      <figcaption>Source: metro_populations_wnba_nba_cities.csv joined to dim_teams.csv and fact_games.csv via the team-level market bridge.</figcaption>
+      
+    </figure>
+    
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Ownership mix over time</h3>
+        <p>The stacked area chart uses ownership_eras_v2.csv to show how the league’s mix evolves from NBA-affiliated control to independent and hybrid eras.</p>
+      </div>
+      <img src="assets/ownership_mix.svg" alt="Ownership mix over time">
+      <figcaption>Source: ownership_eras_v2.csv; yearly counts are derived from the era start/end windows.</figcaption>
+      
+    </figure>
+    
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Market size versus venue utilization</h3>
+        <p>The scatter uses market size on the x-axis and capacity utilization on the y-axis, so it is easy to see which markets have room to grow.</p>
+      </div>
+      <img src="assets/market_utilization_scatter.svg" alt="Market size versus venue utilization">
+      <figcaption>Source: fact_games.csv joined to dim_teams.csv and metro_populations_wnba_nba_cities.csv.</figcaption>
+      
+    </figure>
+    
+      <div class="callout">
+        <strong>Coverage note:</strong> 10 of 13 active teams in the attendance table match a metro population row.
+        The active teams still missing a metro row are Seattle Storm, Connecticut Sun, and Las Vegas Aces. Revenue comparators are known for 6
+        active teams and still missing for 7.
+      </div>
+    </section>
+    
+        
+    <section class="section" id="venues">
+      <div class="section-head">
+        <div class="section-kicker">03 Venue control and capacity</div>
+        <h2>Capacity helps, but control of the building matters just as much.</h2>
+        <p>
+          The article keeps returning to the same idea: the best WNBA economics come from teams that can control premium seats,
+          move marquee games into larger buildings, and capture the revenue that comes with a deeper venue stack.
+        </p>
+      </div>
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Attendance versus arena capacity</h3>
+        <p>Each bubble is a team-level summary. The 45-degree line marks the point where attendance equals capacity, which makes it easy to see which clubs are filling their buildings and which are still constrained by venue size.</p>
+      </div>
+      <img src="assets/capacity_scatter.svg" alt="Attendance versus arena capacity">
+      <figcaption>Source: fact_games.csv joined to dim_venues.csv and dim_teams.csv. Bubble size uses sellout rate.</figcaption>
+      
+    </figure>
+    
+      <div class="callout warning">
+        <strong>Capacity note:</strong> The notebook uses 7,000 seats as the source of truth for College Park Center. The article’s 6,251-seat figure is preserved in the notes as a source discrepancy.
+      </div>
+      <div class="table-section">
+        <div class="section-subhead">Supporting comparison table</div>
+        <p class="table-intro">A venue-level table keeps the comparison concrete: capacity, average attendance, utilization, ownership, and article-specific premium notes.</p>
+        
+    <div class="table-toolbar">
+      <div class="button-group" data-filter-group="owner">
+        <button class="filter-btn active" data-owner-filter="all">All</button>
+        <button class="filter-btn" data-owner-filter="NBA-affiliated">NBA-affiliated</button>
+        <button class="filter-btn" data-owner-filter="Independent">Independent</button>
+        <button class="filter-btn" data-owner-filter="Hybrid">Hybrid</button>
+        <button class="filter-btn" data-owner-filter="Future">Future</button>
+      </div>
+      <div class="table-note">Venue-level comparison of capacity, attendance, and premium inventory.</div>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Venue</th>
+            <th>Capacity</th>
+            <th>Avg attendance</th>
+            <th>Utilization</th>
+            <th>Ownership</th>
+            <th>Premium seats</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr data-owner-type="Independent">
+              <td class="rank">1</td>
+              <td><strong>United Center</strong><div class="muted">Chicago Sky</div></td>
+              <td class="num">20,917</td>
+              <td class="num">19,548.5</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:93%"></span></div>
+                  <span>93.5%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">2</td>
+              <td><strong>TD Garden</strong><div class="muted">Connecticut Sun</div></td>
+              <td class="num">19,580</td>
+              <td class="num">19,140.5</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:98%"></span></div>
+                  <span>97.8%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">3</td>
+              <td><strong>American Airlines Center</strong><div class="muted">Dallas Wings</div></td>
+              <td class="num">21,146</td>
+              <td class="num">19,133.0</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:90%"></span></div>
+                  <span>90.5%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">4</td>
+              <td><strong>Chase Center</strong><div class="muted">Golden State Valkyries</div></td>
+              <td class="num">18,064</td>
+              <td class="num">18,064.0</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:100%"></span></div>
+                  <span>100.0%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">6,000</td>
+              <td class="muted">League-leading premium-seat inventory in the article.</td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">5</td>
+              <td><strong>T-Mobile Arena</strong><div class="muted">Las Vegas Aces</div></td>
+              <td class="num">18,000</td>
+              <td class="num">17,484.8</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:97%"></span></div>
+                  <span>97.1%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">6</td>
+              <td><strong>State Farm Arena</strong><div class="muted">Atlanta Dream</div></td>
+              <td class="num">16,600</td>
+              <td class="num">17,409.0</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:100%"></span></div>
+                  <span>104.9%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">7</td>
+              <td><strong>Gainbridge Fieldhouse</strong><div class="muted">Indiana Fever</div></td>
+              <td class="num">17,274</td>
+              <td class="num">16,786.7</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:97%"></span></div>
+                  <span>97.2%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">8</td>
+              <td><strong>Capital One Arena</strong><div class="muted">Washington Mystics</div></td>
+              <td class="num">20,356</td>
+              <td class="num">15,907.5</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:78%"></span></div>
+                  <span>78.1%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">9</td>
+              <td><strong>Rogers Arena</strong><div class="muted">Atlanta Dream</div></td>
+              <td class="num">18,910</td>
+              <td class="num">15,892.0</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:84%"></span></div>
+                  <span>84.0%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">10</td>
+              <td><strong>Barclays Center</strong><div class="muted">New York Liberty</div></td>
+              <td class="num">17,732</td>
+              <td class="num">14,611.8</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:82%"></span></div>
+                  <span>82.4%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">11</td>
+              <td><strong>Crypto.com Arena</strong><div class="muted">Los Angeles Sparks</div></td>
+              <td class="num">18,997</td>
+              <td class="num">12,178.3</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:64%"></span></div>
+                  <span>64.1%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">12</td>
+              <td><strong>Climate Pledge Arena</strong><div class="muted">Seattle Storm</div></td>
+              <td class="num">18,300</td>
+              <td class="num">11,525.3</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:63%"></span></div>
+                  <span>63.0%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted">Independent team, strong premium monetization.</td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">13</td>
+              <td><strong>CFG Bank Arena</strong><div class="muted">Washington Mystics</div></td>
+              <td class="num">11,614</td>
+              <td class="num">11,183.0</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:96%"></span></div>
+                  <span>96.3%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated">
+              <td class="rank">14</td>
+              <td><strong>PHX Arena</strong><div class="muted">Phoenix Mercury</div></td>
+              <td class="num">18,422</td>
+              <td class="num">11,024.5</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:60%"></span></div>
+                  <span>59.8%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-nba_affiliated">NBA-affiliated</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+            <tr data-owner-type="Independent">
+              <td class="rank">15</td>
+              <td><strong>Michelob ULTRA Arena</strong><div class="muted">Las Vegas Aces</div></td>
+              <td class="num">12,000</td>
+              <td class="num">10,414.2</td>
+              <td>
+                <div class="util-wrap">
+                  <div class="util-bar"><span class="bar-fill" style="width:87%"></span></div>
+                  <span>86.8%</span>
+                </div>
+              </td>
+              <td><span class="pill owner-independent">Independent</span></td>
+              <td class="num">—</td>
+              <td class="muted"></td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </div>
+    
+      </div>
+    </section>
+    
+        
+    <section class="section" id="premium">
+      <div class="section-head">
+        <div class="section-kicker">04 Premium seats and pricing</div>
+        <h2>Premium inventory is the clearest bridge between demand and revenue.</h2>
+        <p>
+          The article argues that “premium seats” are the real economic engine: club seats, courtside rows, suites, signage, and price ladders
+          together explain why some teams look far more scalable than their raw building size suggests.
+        </p>
+      </div>
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Premium inventory supports both demand and pricing power</h3>
+        <p>The left panel uses attendance as a demand proxy; the right panel uses the reported courtside or premium-package price. Together they show why small buildings can still produce big financial stories when premium inventory is scarce.</p>
+      </div>
+      <img src="assets/premium_scatter.svg" alt="Premium inventory supports both demand and pricing power">
+      <figcaption>Source: fact_venue_financials.csv, fact_article_claims.csv, fact_games.csv, and dim_teams.csv.</figcaption>
+      
+    </figure>
+    
+      <div class="callout">
+        <strong>Article highlights to remember:</strong> the Sky’s 770 premium seats, the Wings’ 270 premium seats, the Aces’ $13,000 premium packages, and the Storm’s premium club and suite stack.
+      </div>
+    </section>
+    
+        
+    <section class="section" id="demand">
+      <div class="section-head">
+        <div class="section-kicker">05 Demand spikes</div>
+        <h2>Marquee games, sellouts, and Clark-era demand produce visible spikes in the game log.</h2>
+        <p>
+          A line chart is the best way to show the difference between baseline attendance and the spikes created by records,
+          sellouts, and high-interest matchups. The story is less about a single game and more about the repeated ability to create
+          premium demand moments.
+        </p>
+      </div>
+      
+    <figure class="figure-card">
+      <div class="figure-head">
+        <h3>Game-level spikes over time</h3>
+        <p>Grey points show each game. The line and moving average show the trend, while the highlighted markers isolate sellouts, record games, and Clark appearances.</p>
+      </div>
+      <img src="assets/game_timeline.svg" alt="Game-level spikes over time">
+      <figcaption>Source: fact_games.csv; the chart uses date, attendance, sellout, record-game, and Clark-presence fields.</figcaption>
+      
+    </figure>
+    
+    </section>
+    
+        
+    <section class="section" id="appendix">
+      <div class="section-head">
+        <div class="section-kicker">06 Appendix checklist</div>
+        <h2>The appendix now shows what is still missing to make the dataset complete.</h2>
+        <p>
+          The first table is a simple checklist of unmatched markets, missing revenue comparators, and the operating-income gap.
+          The second table keeps the article’s extracted claims traceable.
+        </p>
+      </div>
+      <div class="table-section">
+        <div class="section-subhead">Coverage checklist</div>
+        <p class="table-intro">Use this as a source-finding list: it names the metric you still need and the rows that remain incomplete.</p>
+        
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Item</th>
+            <th>Needed metric</th>
+            <th>Status / note</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td><span class="pill check-metro">Unmatched metro markets</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">metro_population_million</td>
+              <td class="muted">No metro row in metro_populations_wnba_nba_cities.csv.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-metro">Unmatched metro markets</span></td>
+              <td>Connecticut Sun</td>
+              <td class="muted">metro_population_million</td>
+              <td class="muted">No metro row in metro_populations_wnba_nba_cities.csv.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-metro">Unmatched metro markets</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">metro_population_million</td>
+              <td class="muted">No metro row in metro_populations_wnba_nba_cities.csv.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Golden State Valkyries</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Phoenix Mercury</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Los Angeles Sparks</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Atlanta Dream</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Connecticut Sun</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Current teams missing revenue</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">No supplied NBA revenue comparator matched this team.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-revenue">Ownership-era revenue gap</span></td>
+              <td>13 ownership_eras_v2 rows</td>
+              <td class="muted">nba_revenue_million_usd</td>
+              <td class="muted">These rows still need a revenue comparator if you want full era coverage.</td>
+            </tr>
+            
+            <tr>
+              <td><span class="pill check-income">Operating income gap</span></td>
+              <td>24 ownership_eras_v2 rows</td>
+              <td class="muted">operating_income_million_usd</td>
+              <td class="muted">No operating-income source is present in the current inputs.</td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </div>
+    
+      </div>
+      <div class="table-section">
+        <div class="section-subhead">Claim / evidence table</div>
+        <p class="table-intro">Search the appendix and filter by ownership class to isolate the article’s most important numeric claims.</p>
+        
+    <div class="summary-row"><div class="summary-card"><div class="summary-label">venue</div><div class="summary-value">13</div></div><div class="summary-card"><div class="summary-label">premium</div><div class="summary-value">9</div></div><div class="summary-card"><div class="summary-label">history</div><div class="summary-value">7</div></div><div class="summary-card"><div class="summary-label">financial</div><div class="summary-value">6</div></div><div class="summary-card"><div class="summary-label">ownership</div><div class="summary-value">5</div></div><div class="summary-card"><div class="summary-label">staffing</div><div class="summary-value">3</div></div><div class="summary-card"><div class="summary-label">culture</div><div class="summary-value">2</div></div><div class="summary-card"><div class="summary-label">expansion</div><div class="summary-value">1</div></div><div class="summary-card"><div class="summary-label">strategy</div><div class="summary-value">1</div></div></div>
+    <div class="table-toolbar">
+      <div class="button-group" data-filter-group="claims">
+        <button class="filter-btn active" data-owner-filter="all">All</button>
+        <button class="filter-btn" data-owner-filter="NBA-affiliated">NBA-affiliated</button>
+        <button class="filter-btn" data-owner-filter="Independent">Independent</button>
+        <button class="filter-btn" data-owner-filter="Hybrid">Hybrid</button>
+        <button class="filter-btn" data-owner-filter="Future">Future</button>
+      </div>
+      <input id="claimSearch" class="search-box" type="search" placeholder="Search claims, teams, venues, or values...">
+    </div>
+    <div class="table-scroll claim-table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Team</th>
+            <th>Venue</th>
+            <th>Claim</th>
+            <th>Value</th>
+            <th>Unit</th>
+            <th>Para</th>
+          </tr>
+        </thead>
+        <tbody id="claimsBody">
+          
+            <tr data-owner-type="Independent" data-claim-type="culture">
+              <td><span class="pill claim-culture">culture</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">—</td>
+              <td>“We only have our team to care about here,” she said.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">45</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="culture">
+              <td><span class="pill claim-culture">culture</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">—</td>
+              <td>HOW THE INDEPENDENT FRANCHISES CAME TO BE:</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">47</td>
+            </tr>
+            
+            <tr data-owner-type="all" data-claim-type="expansion">
+              <td><span class="pill claim-expansion">expansion</span></td>
+              <td>—</td>
+              <td class="muted">—</td>
+              <td>“It’s a challenge, but, I mean, we’ve got three championships in five years,” said Aces President Nikki Fargas.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">11</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="financial">
+              <td><span class="pill claim-financial">financial</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">Wintrust Arena</td>
+              <td>That’s the upside of having only 770 premium seats-- the secondary market elevates the prices. But it pales to what the Bulls can do with premium at United Center, which is why the Sky (who arrived as an independent expansion franchise in 2006 because Bulls owner Jerry Reinsdorf wasn’t interested) are vetting the Bulls’ arena.</td>
+              <td class="num">650,000</td>
+              <td class="muted">usd</td>
+              <td class="num">29</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="financial">
+              <td><span class="pill claim-financial">financial</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">—</td>
+              <td>Where the Mystics and Sparks make up ground is in partnership revenue, where they rank at or near the top half of the league. That’s the crucial NBA-affiliated advantage: enterprise-wide allocation.</td>
+              <td class="num">37</td>
+              <td class="muted">employees</td>
+              <td class="num">39</td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated" data-claim-type="financial">
+              <td><span class="pill claim-financial">financial</span></td>
+              <td>Los Angeles Sparks</td>
+              <td class="muted">Crypto Com Arena</td>
+              <td>But the independent franchise that most replicates the NBA-affiliated model is the Storm, which plays in the Kraken’s Climate Pledge Arena (capacity 18,300) and, according to data, averaged an independent-high 8,300 tickets sold last year and the league’s fifth-best average gate at $530,000.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">40</td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated" data-claim-type="financial">
+              <td><span class="pill claim-financial">financial</span></td>
+              <td>Washington Mystics</td>
+              <td class="muted">—</td>
+              <td>The Storm aren’t primary tenants, but, according to Gilder, the team can monetize the arena’s premium Moet Club and team shop. CEO and President Alisha Valavanis also said they sell premium courtside seating, a number of premium VIP dining experiences and temporary signage in specific crevices of the arena, not to mention a small number of suites on a single-game basis. Their ticket renewal rate is roughly 90% YoY, near the top of the league. All without a brother NBA franchise.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">41</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="financial">
+              <td><span class="pill claim-financial">financial</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">Climate Pledge Arena</td>
+              <td>In the front office, they employ an NBA-like eight C-suite executives — CEO, COO, CFO, CMO, CCO, CSO, CHRO and GM. Alongside the Aces, they were the first WNBA team to build an upscale practice facility, with tailored signs inside that say “Success Doesn’t Travel Solo” and “Do What You Love.’’</td>
+              <td class="num">8,300</td>
+              <td class="muted">tickets sold</td>
+              <td class="num">42</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="financial">
+              <td><span class="pill claim-financial">financial</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">Climate Pledge Arena</td>
+              <td>“We thought we were building a practice facility, and we ended up building a home,” Gilder said.</td>
+              <td class="num">90</td>
+              <td class="muted">percent</td>
+              <td class="num">43</td>
+            </tr>
+            
+            <tr data-owner-type="all" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>—</td>
+              <td class="muted">—</td>
+              <td>“It might be a trend,” said Ginny Gilder, co-owner of the Storm. “What it says is that NBA owners finally see the value prop, and honestly, they’re the ones who own these world-class arenas. So, if you were going to expand, wouldn’t you want the locations that have the world-class arenas to expand into women’s sports? At a certain level, it just makes sense for what’s best for the W.”</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">9</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">—</td>
+              <td>Storm: expansion, 2000 (owned by the Sonics). Sold in 2008 to Dawn Trudeau, Lisa Brummel and Ginny Gilder after Sonics relocated to Oklahoma City.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">51</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>Atlanta Dream</td>
+              <td class="muted">—</td>
+              <td>Sun: Orlando Miracle (1999-2002, owned by Magic), Sun (2003-2026), Houston (2027, sold to Rockets owner Tilman Fertitta).</td>
+              <td class="num">2,008</td>
+              <td class="muted">year</td>
+              <td class="num">52</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">—</td>
+              <td>Wings: Detroit Shock (1998-2009, owned by Pistons), Tulsa Shock (2010-15, owned by Bill Cameron), Wings (2016-present, owned by Cameron).</td>
+              <td class="num">2,006</td>
+              <td class="muted">year</td>
+              <td class="num">53</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">—</td>
+              <td>Source: With the WNBA trending toward NBA-affiliated franchises, the final independents hang on, Sports Business Journal (4/2026)</td>
+              <td class="num">2,000</td>
+              <td class="muted">year</td>
+              <td class="num">54</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>Connecticut Sun</td>
+              <td class="muted">—</td>
+              <td>The Sun moved from Orlando Miracle to the Sun in 2003 and are headed to Houston in 2027</td>
+              <td class="num">2,027</td>
+              <td class="muted">year</td>
+              <td class="num">55</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="history">
+              <td><span class="pill claim-history">history</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">—</td>
+              <td>The Wings lineage includes Detroit Shock, Tulsa Shock, and the current Wings</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">56</td>
+            </tr>
+            
+            <tr data-owner-type="all" data-claim-type="ownership">
+              <td><span class="pill claim-ownership">ownership</span></td>
+              <td>—</td>
+              <td class="muted">—</td>
+              <td>Now look over at the owners, CEOs or presidents for the Chicago Sky, Dallas Wings, Las Vegas Aces, Seattle Storm and Atlanta Dream — the last five pre-expansion independent franchises in the league with the Sun on their way out. Now look at their mostly smallish arenas. Look over and wonder what they’re thinking. It’s probably what everyone else is thinking: that the future of the WNBA is in NBA buildings with NBA ownership groups.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">4</td>
+            </tr>
+            
+            <tr data-owner-type="all" data-claim-type="ownership">
+              <td><span class="pill claim-ownership">ownership</span></td>
+              <td>—</td>
+              <td class="muted">—</td>
+              <td>“Well, if it walks like a duck and, what is it, quacks like a duck?” said Sky CEO and President Adam Fox. “There’s a lot to it. So I don’t know if it’s a trend. I don’t know if it’s a coincidence. I don’t want to pretend to be — here’s a reference: a Kreskin — to be able to know what it is. But I read the tea leaves just like everybody else.”</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">5</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="ownership">
+              <td><span class="pill claim-ownership">ownership</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">Michelob Ultra Arena</td>
+              <td>Their journeys are unique, all five of them, starting with the winding road of the Wings. They launched as the Detroit Shock, owned by Pistons governor Bill Davidson, before being sold to American Fidelity Corp. CEO Bill Cameron in 2009 following Davidson’s death.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">13</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="ownership">
+              <td><span class="pill claim-ownership">ownership</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">—</td>
+              <td>Cameron high-tailed the Shock to Tulsa for seven seasons before relocating in 2016 to Dallas — where then-Mavericks owner Mark Cuban had never been dying for a team.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">15</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="ownership">
+              <td><span class="pill claim-ownership">ownership</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">—</td>
+              <td>Dream: expansion, 2008.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">49</td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Golden State Valkyries</td>
+              <td class="muted">Chase Center</td>
+              <td>But the Wings, according to Bibb, have 270 premium seats, and their challenge — like the other independent franchises who don’t own or control their middling-sized buildings — is their ongoing hunt for more.</td>
+              <td class="num">6,000</td>
+              <td class="muted">premium seats</td>
+              <td class="num">20</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">College Park Center</td>
+              <td>The team does control the temporary signage and the intervenable signage there. But, otherwise, the Wings’ best solutions are their recent high-end sponsorships with CVS and Geico, and their impending move two years from now to renovated Dallas Memorial Auditorium.</td>
+              <td class="num">270</td>
+              <td class="muted">premium seats</td>
+              <td class="num">22</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">College Park Center</td>
+              <td>At that newly renovated city-owned building (roughly 8,500 seats), the Wings will at least be the primary tenant, with increased signage and premium to sell, plus a revenue-sharing package for parking, food and beverage. Ticket demand should also meteorize prices, though Bibb said if he knew then what he knows now, he might have pushed for a higher seating capacity.</td>
+              <td class="num">198</td>
+              <td class="muted">seats</td>
+              <td class="num">23</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">Wintrust Arena</td>
+              <td>That’s the upside of having only 770 premium seats-- the secondary market elevates the prices. But it pales to what the Bulls can do with premium at United Center, which is why the Sky (who arrived as an independent expansion franchise in 2006 because Bulls owner Jerry Reinsdorf wasn’t interested) are vetting the Bulls’ arena.</td>
+              <td class="num">11,000</td>
+              <td class="muted">usd</td>
+              <td class="num">29</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">Wintrust Arena</td>
+              <td>That’s the upside of having only 770 premium seats-- the secondary market elevates the prices. But it pales to what the Bulls can do with premium at United Center, which is why the Sky (who arrived as an independent expansion franchise in 2006 because Bulls owner Jerry Reinsdorf wasn’t interested) are vetting the Bulls’ arena.</td>
+              <td class="num">985</td>
+              <td class="muted">usd</td>
+              <td class="num">29</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">Wintrust Arena</td>
+              <td>“We just don’t have the same institutional overall resources [as NBA-owned teams],” Fox said. “If an NBA big brother is putting 15 to 20,000 people in the arena every night, it’s a great chance to message people throughout the year and create the sort of synergy that exists between the W team and the NBA team. So we have to find other ways to do it.”</td>
+              <td class="num">770</td>
+              <td class="muted">premium seats</td>
+              <td class="num">31</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Atlanta Dream</td>
+              <td class="muted">Gateway Center Arena College Park</td>
+              <td>The Portland Fire -- whose governor, Lisa Bhathal Merage, is a minority owner of the NBA’s Kings -- don’t have a whole country, but has the Trail Blazers arena, the 19,393-seat Moda Center.</td>
+              <td class="num">200</td>
+              <td class="muted">premium seats</td>
+              <td class="num">34</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">—</td>
+              <td>Where the Mystics and Sparks make up ground is in partnership revenue, where they rank at or near the top half of the league. That’s the crucial NBA-affiliated advantage: enterprise-wide allocation.</td>
+              <td class="num">13,000</td>
+              <td class="muted">usd</td>
+              <td class="num">39</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="premium">
+              <td><span class="pill claim-premium">premium</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">Climate Pledge Arena</td>
+              <td>“We thought we were building a practice facility, and we ended up building a home,” Gilder said.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">43</td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated" data-claim-type="staffing">
+              <td><span class="pill claim-staffing">staffing</span></td>
+              <td>Indiana Fever</td>
+              <td class="muted">—</td>
+              <td>The Wings overcame the shortfall, although CEO and managing partner Greg Bibb said his staff was complemented by College Park Center’s ticketing partner, AXS, for individual sales. “So it’s not like everyone trying to buy a single ticket is calling our office,” Bibb said.</td>
+              <td class="num">50</td>
+              <td class="muted">staff</td>
+              <td class="num">18</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="staffing">
+              <td><span class="pill claim-staffing">staffing</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">—</td>
+              <td>The Wings overcame the shortfall, although CEO and managing partner Greg Bibb said his staff was complemented by College Park Center’s ticketing partner, AXS, for individual sales. “So it’s not like everyone trying to buy a single ticket is calling our office,” Bibb said.</td>
+              <td class="num">13</td>
+              <td class="muted">staff</td>
+              <td class="num">18</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="staffing">
+              <td><span class="pill claim-staffing">staffing</span></td>
+              <td>Seattle Storm</td>
+              <td class="muted">Climate Pledge Arena</td>
+              <td>That’s the other side of the story: the mom-and-pop charm of these last few independent franchises. Gilder, the owner, has literally dog-sat former player Jewell Loyd’s dogs, and has her staff help players with their taxes.</td>
+              <td class="num">8</td>
+              <td class="muted">executives</td>
+              <td class="num">44</td>
+            </tr>
+            
+            <tr data-owner-type="all" data-claim-type="strategy">
+              <td><span class="pill claim-strategy">strategy</span></td>
+              <td>—</td>
+              <td class="muted">—</td>
+              <td>So the Aces might as well have been an expansion team. When Fargas arrived in 2021, the franchise had just eight front-office employees (“I chuckle because we made it to the semifinals with eight,’’ Fargas said) and now have 37. They also now have high-end sponsorships (Ally Financial, IPSY), a local TV deal (with Scripps), an NFL owner (Mark Davis) and $13,000 premium packages — all to offset their arena size.</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">37</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">American Airlines Center</td>
+              <td>But that’s the world of an independent franchise. When the Indiana Fever drafted Caitlin Clark, they had the Pacers’ NBA infrastructure and a PS&amp;E ticketing staff of roughly 50 people to handle the thousands of inbound calls. The Wings’ ticketing staff was 13 people.</td>
+              <td class="num">20,000</td>
+              <td class="muted">seats</td>
+              <td class="num">17</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">College Park Center</td>
+              <td>But that’s the world of an independent franchise. When the Indiana Fever drafted Caitlin Clark, they had the Pacers’ NBA infrastructure and a PS&amp;E ticketing staff of roughly 50 people to handle the thousands of inbound calls. The Wings’ ticketing staff was 13 people.</td>
+              <td class="num">6,251</td>
+              <td class="muted">seats</td>
+              <td class="num">17</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Dallas Wings</td>
+              <td class="muted">Dallas Memorial Auditorium</td>
+              <td>Seeking bigger digs</td>
+              <td class="num">8,500</td>
+              <td class="muted">seats</td>
+              <td class="num">24</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">Wintrust Arena</td>
+              <td>“Supply and demand is real,” Fox said. “And sometimes there’s that Studio 54 effect: you want to get those better seats. And that helps the price of those seats be a little bit more, and people want to be in them and there aren’t as many of them. It does help.”</td>
+              <td class="num">10,387</td>
+              <td class="muted">seats</td>
+              <td class="num">28</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Chicago Sky</td>
+              <td class="muted">United Center</td>
+              <td>The Dream’s strategy, to counteract playing in the league’s smallest building and having fewer than 200 premium seats, is scheduling a franchise-high five games this season at State Farm Arena, operated by Atlanta Hawks owner Tony Ressler. In Las Vegas, the Aces will move three games to 18,000-seat T-Mobile Arena, continuing a trend that Engelbert said is paramount: “the ability to upsize to other arenas.’’</td>
+              <td class="num">—</td>
+              <td class="muted">—</td>
+              <td class="num">32</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Atlanta Dream</td>
+              <td class="muted">State Farm Arena</td>
+              <td>The Portland Fire -- whose governor, Lisa Bhathal Merage, is a minority owner of the NBA’s Kings -- don’t have a whole country, but has the Trail Blazers arena, the 19,393-seat Moda Center.</td>
+              <td class="num">5</td>
+              <td class="muted">games</td>
+              <td class="num">34</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Las Vegas Aces</td>
+              <td class="muted">T Mobile Arena</td>
+              <td>The Portland Fire -- whose governor, Lisa Bhathal Merage, is a minority owner of the NBA’s Kings -- don’t have a whole country, but has the Trail Blazers arena, the 19,393-seat Moda Center.</td>
+              <td class="num">3</td>
+              <td class="muted">games</td>
+              <td class="num">34</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Toronto Tempo</td>
+              <td class="muted">Coca Cola Coliseum</td>
+              <td>For that reason, Engelbert is adamant that non-NBA ownership groups have a chance going forward in expansion (though an owner-controlled building with more than 10,000-seats would presumably help), and said the league looks at psychographics and metrics such as population, Black population, TV households, median household, income, women’s NCAA Tournament viewership and USA Basketball viewership for both men and women.</td>
+              <td class="num">8,700</td>
+              <td class="muted">seats</td>
+              <td class="num">35</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Toronto Tempo</td>
+              <td class="muted">Scotiabank Arena</td>
+              <td>For that reason, Engelbert is adamant that non-NBA ownership groups have a chance going forward in expansion (though an owner-controlled building with more than 10,000-seats would presumably help), and said the league looks at psychographics and metrics such as population, Black population, TV households, median household, income, women’s NCAA Tournament viewership and USA Basketball viewership for both men and women.</td>
+              <td class="num">19,800</td>
+              <td class="muted">seats</td>
+              <td class="num">35</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Toronto Tempo</td>
+              <td class="muted">Bell Centre</td>
+              <td>For that reason, Engelbert is adamant that non-NBA ownership groups have a chance going forward in expansion (though an owner-controlled building with more than 10,000-seats would presumably help), and said the league looks at psychographics and metrics such as population, Black population, TV households, median household, income, women’s NCAA Tournament viewership and USA Basketball viewership for both men and women.</td>
+              <td class="num">22,114</td>
+              <td class="muted">seats</td>
+              <td class="num">35</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Toronto Tempo</td>
+              <td class="muted">Rogers Arena</td>
+              <td>For that reason, Engelbert is adamant that non-NBA ownership groups have a chance going forward in expansion (though an owner-controlled building with more than 10,000-seats would presumably help), and said the league looks at psychographics and metrics such as population, Black population, TV households, median household, income, women’s NCAA Tournament viewership and USA Basketball viewership for both men and women.</td>
+              <td class="num">19,700</td>
+              <td class="muted">seats</td>
+              <td class="num">35</td>
+            </tr>
+            
+            <tr data-owner-type="Independent" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Portland Fire</td>
+              <td class="muted">Moda Center</td>
+              <td>The point is, there has to be potential for growth — like what’s happened in Las Vegas. The Aces were once the NBA-affiliated Utah Starzz (1997-2002) and the San Antonio Silver Stars (2003-17) before coming to Vegas as an independent in 2018. Donna Orender, the league president from 2005-2010, said NBA owners were fleeing the W at the time because the NBA was a “huge currency’’ and the owners’ thought, “That’s going to take more of my attention than this little WNBA team, which I’m not sure where it’s going to go. And the independent owners, they didn’t know where it was going to go, either, but they knew that’s what they wanted.’’</td>
+              <td class="num">19,393</td>
+              <td class="muted">seats</td>
+              <td class="num">36</td>
+            </tr>
+            
+            <tr data-owner-type="NBA-affiliated" data-claim-type="venue">
+              <td><span class="pill claim-venue">venue</span></td>
+              <td>Washington Mystics</td>
+              <td class="muted">Carefirst Arena</td>
+              <td>But the independent franchise that most replicates the NBA-affiliated model is the Storm, which plays in the Kraken’s Climate Pledge Arena (capacity 18,300) and, according to data, averaged an independent-high 8,300 tickets sold last year and the league’s fifth-best average gate at $530,000.</td>
+              <td class="num">4,200</td>
+              <td class="muted">seats</td>
+              <td class="num">40</td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </div>
+    
+      </div>
+    </section>
+    
+        
+    <section class="section" id="methods">
+      <div class="section-head">
+        <div class="section-kicker">Method notes</div>
+        <h2>Sources, joins, and interpretation</h2>
+      </div>
+      <div class="method-grid">
+        <div class="method-box">
+          <strong>Source set</strong>
+          <p>All charts use the normalized outputs in <code>outputs/wnba_expansion/</code>, especially <code>fact_games.csv</code>, <code>dim_teams.csv</code>, <code>dim_venues.csv</code>, <code>fact_venue_financials.csv</code>, and <code>fact_article_claims.csv</code>, plus the market and ownership summary CSVs created by this build.</p>
+        </div>
+        <div class="method-box">
+          <strong>Key join logic</strong>
+          <p>The notebook treats <code>dim_teams</code> as the ownership dimension, <code>dim_venues</code> as the capacity dimension, <code>fact_games</code> as the game-level event table, and the metro file as a team-level market bridge rather than a row-level join.</p>
+        </div>
+        <div class="method-box">
+          <strong>Data discrepancy handled</strong>
+          <p>The notebook uses 7,000 seats as the source of truth for College Park Center. The article’s 6,251-seat figure is preserved in the notes as a source discrepancy.</p>
+        </div>
+      </div>
+    </section>
+    
+      </div>
+      
+    <script>
+      function normalize(value) {
+        return (value || '').toString().trim().toLowerCase();
+      }
+
+      function applyFilters() {
+        const ownerButtons = document.querySelectorAll('[data-filter-group="owner"] .filter-btn');
+        const claimButtons = document.querySelectorAll('[data-filter-group="claims"] .filter-btn');
+        const selectedOwner = document.querySelector('[data-filter-group="owner"] .filter-btn.active')?.dataset.ownerFilter || 'all';
+        const selectedClaimOwner = document.querySelector('[data-filter-group="claims"] .filter-btn.active')?.dataset.ownerFilter || 'all';
+        const search = normalize(document.getElementById('claimSearch')?.value || '');
+
+        document.querySelectorAll('[data-owner-type]').forEach((row) => {
+          const rowOwner = normalize(row.dataset.ownerType || 'all');
+          const rowText = normalize(row.innerText);
+          let show = true;
+          if (row.closest('#claimsBody')) {
+            if (search) {
+              show = rowText.includes(search);
+            }
+            if (selectedClaimOwner !== 'all' && rowOwner !== 'all' && rowOwner !== normalize(selectedClaimOwner)) {
+              show = false;
+            }
+          } else {
+            if (selectedOwner !== 'all' && rowOwner !== normalize(selectedOwner)) {
+              show = false;
+            }
+          }
+          row.style.display = show ? '' : 'none';
+        });
+      }
+
+      document.querySelectorAll('.button-group .filter-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const group = btn.closest('[data-filter-group]');
+          group.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyFilters();
+        });
+      });
+
+      document.getElementById('claimSearch')?.addEventListener('input', applyFilters);
+      applyFilters();
+    </script>
+    
+    </body>
+    </html>
+    
